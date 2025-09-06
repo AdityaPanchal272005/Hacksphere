@@ -49,19 +49,7 @@ export const requestOtp = async (req, res, next) => {
   }
 };
 
-export const verifyOtp = async (req, res, next) => {
-  try {
-    const { email, otp } = req.body;
-    if (otpStore[email] && otpStore[email] === otp) {
-      delete otpStore[email]; // OTP verified, remove it from store
-      res.json({ message: 'OTP verified successfully.' });
-    } else {
-      return next(new UnauthorizedError('Invalid OTP.'));
-    }
-  } catch (err) {
-    next(err);
-  }
-};
+
 
 export const register = async (req, res, next) => {
   try {
@@ -109,6 +97,40 @@ export const login = async (req, res, next) => {
       },
       token,
     });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const verifyOtp = async (req, res, next) => {
+  try {
+    const { email, otp } = req.body;
+    if (otpStore[email] && otpStore[email] === otp) {
+      delete otpStore[email]; // OTP verified, remove it from store
+
+      // Log in the user after successful OTP verification
+      const user = await User.findOne({ email });
+      if (!user) {
+        // If user doesn't exist, create a new one
+        const newUser = new User({ email, username: email, passwordHash: 'otp_user' });
+        await newUser.save();
+        const token = jwt.sign({ id: newUser._id, role: newUser.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+        return res.json({
+          message: 'OTP verified and user created successfully.',
+          user: newUser,
+          token,
+        });
+      }
+
+      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+      res.json({
+        message: 'OTP verified successfully.',
+        user,
+        token,
+      });
+    } else {
+      return next(new UnauthorizedError('Invalid OTP.'));
+    }
   } catch (err) {
     next(err);
   }
