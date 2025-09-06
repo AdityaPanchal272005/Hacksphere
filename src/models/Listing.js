@@ -43,8 +43,8 @@ const ListingSchema = new Schema(
   }
 );
 
-ListingSchema.index({ title: 'text', description: 'text' });
-ListingSchema.index({ category: 1, createdAt: -1 });
-ListingSchema.index({ sellerId: 1 });
+// ListingSchema.index({ title: 'text', description: 'text' });
+// ListingSchema.index({ category: 1, createdAt: -1 });
+// ListingSchema.index({ sellerId: 1 });
 
 export default mongoose.model('Listing', ListingSchema);
