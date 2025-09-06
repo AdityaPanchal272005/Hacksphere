@@ -1,10 +1,20 @@
 import User from '../models/User.js';
 import { ConflictError, UnauthorizedError, ForbiddenError } from '../middleware/errors.js';
 import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
 
-// Note: You will need a way to send OTPs (e.g., via email or SMS). 
-// You can use a service like Nodemailer, Twilio, or Firebase. 
-// For this example, we will just simulate it.
+// A simple in-memory store for OTPs for this hackathon.
+// In a production app, use a database or a secure cache like Redis.
+const otpStore = {};
+
+// Nodemailer setup
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS,
+  },
+});
 
 export const checkEmailExists = async (req, res, next) => {
   try {
@@ -20,14 +30,19 @@ export const checkEmailExists = async (req, res, next) => {
 
 export const requestOtp = async (req, res, next) => {
   try {
-    const user = await User.findOne({ email: req.body.email });
-    if (!user) {
-      // Simulate OTP generation and sending for existing user.
-      // In a real app, this would be a trigger for an external service.
-      return res.json({ message: 'OTP sent to your email.' });
-    }
-    // Logic for new user, e.g., create a temporary user record
-    // and send a registration OTP.
+    const { email } = req.body;
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    otpStore[email] = otp;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: 'EcoFinds OTP Verification',
+      text: `Your OTP for EcoFinds is: ${otp}`,
+    };
+
+    await transporter.sendMail(mailOptions);
+
     res.json({ message: 'OTP sent to your email.' });
   } catch (err) {
     next(err);
@@ -36,10 +51,13 @@ export const requestOtp = async (req, res, next) => {
 
 export const verifyOtp = async (req, res, next) => {
   try {
-    // In a real app, you would verify the OTP here.
-    // E.g., check against a stored OTP code.
-    // Assuming for simplicity that it always succeeds for now.
-    res.json({ message: 'OTP verified successfully.' });
+    const { email, otp } = req.body;
+    if (otpStore[email] && otpStore[email] === otp) {
+      delete otpStore[email]; // OTP verified, remove it from store
+      res.json({ message: 'OTP verified successfully.' });
+    } else {
+      return next(new UnauthorizedError('Invalid OTP.'));
+    }
   } catch (err) {
     next(err);
   }

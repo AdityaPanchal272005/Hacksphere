@@ -1,6 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import passport from 'passport';
 import { Strategy as JwtStrategy, ExtractJwt } from 'passport-jwt';
 import User from './src/models/User.js'; // Ensure the path is correct
@@ -14,6 +15,15 @@ import ordersRoutes from './src/routes/orders.routes.js';
 dotenv.config();
 
 const app = express();
+
+// CORS configuration
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-frontend-domain.com'] // Replace with your actual frontend URL
+    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173'], // Common dev ports
+  credentials: true
+}));
+
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;

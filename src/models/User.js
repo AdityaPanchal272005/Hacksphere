@@ -1,3 +1,5 @@
+// src/models/User.js
+
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
@@ -47,5 +49,10 @@ UserSchema.pre('save', async function (next) {
   }
   next();
 });
+
+// Add the comparePassword method here
+UserSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.passwordHash);
+};
 
 export default mongoose.model('User', UserSchema);
