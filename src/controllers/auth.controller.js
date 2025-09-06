@@ -63,6 +63,30 @@ export const verifyOtp = async (req, res, next) => {
   }
 };
 
+export const register = async (req, res, next) => {
+  try {
+    const { email, password, username } = req.body;
+    const existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      return next(new ConflictError('Email already in use.'));
+    }
+
+    const newUser = new User({
+      email,
+      username,
+      passwordHash: password, // The pre-save hook will hash this
+      role: 'user', // Default role
+    });
+
+    await newUser.save();
+
+    res.status(201).json({ message: 'User created successfully. Please log in.' });
+  } catch (err) {
+    next(err);
+  }
+};
+
 export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
