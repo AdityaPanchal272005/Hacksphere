@@ -1,0 +1,84 @@
+### Variables
+@baseUrl = http://localhost:3000
+@token = 
+
+### 1. Test Server - Get Categories
+GET {{baseUrl}}/api/categories
+
+### 2. Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "testuser@example.com",
+  "password": "password123",
+  "role": "buyer"
+}
+
+### 3. Login user (copy the token from response)
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "password123"
+}
+
+### 4. Create a category (need admin role and token)
+POST {{baseUrl}}/api/categories
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "name": "Electronics"
+}
+
+### 5. Get user cart (need token)
+GET {{baseUrl}}/api/cart
+Authorization: Bearer {{token}}
+
+### 6. Create a listing (need token)
+POST {{baseUrl}}/api/listings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "iPhone 15",
+  "description": "Latest iPhone model",
+  "price": 999,
+  "category": "Electronics",
+  "imageUrl": "https://example.com/iphone.jpg",
+  "condition": "new",
+  "location": "New York"
+}
+
+### 7. Get all listings
+GET {{baseUrl}}/api/listings
+
+### 8. Add item to cart (need token)
+POST {{baseUrl}}/api/cart/add
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "listingId": "LISTING_ID_HERE",
+  "qty": 1,
+  "title": "iPhone 15",
+  "price": 999,
+  "imageUrl": "https://example.com/iphone.jpg"
+}
+
+### 9. Create order from cart (need token)
+POST {{baseUrl}}/api/orders
+Authorization: Bearer {{token}}
+
+### 10. Get user orders (need token)
+GET {{baseUrl}}/api/orders
+Authorization: Bearer {{token}}
+
+### Testing Production URL (replace with your Render URL)
+@prodUrl = https://your-app-name.onrender.com
+
+### Test production server
+GET {{prodUrl}}/api/categories

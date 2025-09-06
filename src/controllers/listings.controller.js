@@ -1,6 +1,7 @@
 import Listing from '../models/Listing.js';
 import { NotFoundError, ForbiddenError } from '../middleware/errors.js';
 
+// Add this function to get a user's own listings
 export const getMyListings = async (req, res, next) => {
   try {
     const listings = await Listing.find({ sellerId: req.user.id }).populate('sellerId', 'username email');
