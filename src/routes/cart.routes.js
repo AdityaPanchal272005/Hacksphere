@@ -1,8 +1,8 @@
 import { Router } from 'express';
 import {
   getCart,
-  addItemToCart,
-  removeItemFromCart,
+  addToCart,
+  removeCartItem, // Corrected from removeItemFromCart
 } from '../controllers/cart.controller.js';
 import { requireAuth } from '../middleware/auth.js';
 import {
@@ -15,7 +15,7 @@ const router = Router();
 router.use(requireAuth);
 
 router.get('/', getCart);
-router.post('/add', validateCartAddItem, addItemToCart);
-router.post('/remove', validateCartRemoveItem, removeItemFromCart);
+router.post('/add', validateCartAddItem, addToCart);
+router.post('/remove', validateCartRemoveItem, removeCartItem); // Corrected from removeItemFromCart
 
 export default router;

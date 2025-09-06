@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import {
-  getAllCategories,
+  getCategories, // Corrected from getAllCategories
   createCategory,
   deleteCategory,
 } from '../controllers/categories.controller.js';
@@ -9,7 +9,7 @@ import { validateCategory } from '../middleware/validate.js';
 
 const router = Router();
 
-router.get('/', getAllCategories);
+router.get('/', getCategories); // Corrected from getAllCategories
 router.post('/', requireAuth, requireAdmin, validateCategory, createCategory);
 router.delete('/:slug', requireAuth, requireAdmin, deleteCategory);
 

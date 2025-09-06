@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
-  placeOrder,
-  getOrders,
+  createOrderFromCart, // Corrected from placeOrder
+  getUserOrders,
 } from '../controllers/orders.controller.js';
 import { requireAuth } from '../middleware/auth.js';
 import { validatePagination } from '../middleware/validate.js';
@@ -10,7 +10,7 @@ const router = Router();
 
 router.use(requireAuth);
 
-router.post('/', placeOrder);
-router.get('/', validatePagination, getOrders);
+router.post('/', createOrderFromCart); // Corrected from placeOrder
+router.get('/', validatePagination, getUserOrders);
 
 export default router;

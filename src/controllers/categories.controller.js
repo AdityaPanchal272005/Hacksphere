@@ -20,3 +20,17 @@ export const createCategory = async (req, res, next) => {
     next(err);
   }
 };
+
+export const deleteCategory = async (req, res, next) => {
+  try {
+    const { slug } = req.params;
+    const category = await Category.findOne({ slug });
+    if (!category) {
+      return next(new NotFoundError('Category not found.'));
+    }
+    await category.deleteOne();
+    res.json({ message: 'Category removed successfully.' });
+  } catch (err) {
+    next(err);
+  }
+};

@@ -74,3 +74,12 @@ export const deleteListing = async (req, res, next) => {
     next(err);
   }
 };
+
+export const getMyListings = async (req, res, next) => {
+  try {
+    const listings = await Listing.find({ sellerId: req.user.id }).populate('sellerId', 'username email');
+    res.json(listings);
+  } catch (err) {
+    next(err);
+  }
+};
